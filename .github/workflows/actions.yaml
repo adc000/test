@@ -1,0 +1,44 @@
+name: Create Release on Push
+
+on:
+  push:
+    branches:
+      - master  # 또는 master, 원하는 브랜치로 설정
+
+permissions:
+  contents: write
+
+jobs:
+  create-release:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Get Latest Commit Message
+        id: get_commit_message
+        run: echo "COMMIT_TITLE=$(git log -1 --pretty=%s | tr -d '\n')" >> $GITHUB_ENV
+
+      - name: zip files
+        run: |
+          zip -r ./홍보기/$COMMIT_TITLE.zip ./홍보기/홍보기.exe ./홍보기/changelog ./홍보기/data.txt ./홍보기/README.md
+
+      - name: Create Tag from Commit Title
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag $COMMIT_TITLE
+          git push --force origin $COMMIT_TITLE
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.COMMIT_TITLE }}
+          name: ${{ env.COMMIT_TITLE }}
+          draft: false
+          prerelease: false
+          files: |
+            ./홍보기/${{ env.COMMIT_TITLE }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

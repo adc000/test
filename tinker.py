@@ -14,8 +14,28 @@ from tkinter.filedialog import asksaveasfilename
 import threading
 import os
 import subprocess
+import requests
+import webbrowser
+import sys
+
+CURRENT_VERSION = "v2.1.1"
 
 urls = []
+
+def check_for_update():
+    try:
+        response = requests.get("https://api.github.com/repos/adc000/Hongbo/releases/latest")
+        latest_version = response.json()["tag_name"]
+
+        if CURRENT_VERSION != latest_version:
+            messagebox.showinfo("업데이트 필요", f"최신 버전 {latest_version}이(가) 있습니다.")
+            webbrowser.open("https://github.com/adc000/Hongbo/releases/tag/{}", latest_version)
+            root.destroy()
+            sys.exit()
+    except requests.RequestException as e:
+        messagebox.showerror("오류", f"업데이트 확인 중 오류가 발생했습니다: {e}")
+        root.destroy()
+        sys.exit()
 
 # 메모장으로 파일 열기 함수
 def open_in_notepad(file_path):
@@ -316,7 +336,7 @@ def test():
     cnt_entry4.config(state="normal")
 
 
-    answer = messagebox.askyesno("클립보드에 url들을 복사하시겠습니까?")
+    answer = messagebox.askyesno("홍보끝", "클립보드에 url들을 복사하시겠습니까?")
     if answer:
         root.clipboard_clear()
         for idx, url in enumerate(urls):
@@ -324,9 +344,15 @@ def test():
 
     import os
     show_notification(os.path.realpath(file_path))
+    root.destroy()
 
 root = tk.Tk()
 root.title("홍보 자동화 툴")
+
+root.withdraw()
+check_for_update()
+
+root.deiconify()
 
 entries = []
 
