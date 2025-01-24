@@ -18,9 +18,11 @@ import requests
 import webbrowser
 import sys
 
-CURRENT_VERSION = "v2.1.1"
+CURRENT_VERSION = "v2.2"
 
 urls = []
+titletxt = ""
+subjecttxt = ""
 
 def check_for_update():
     try:
@@ -29,7 +31,7 @@ def check_for_update():
 
         if CURRENT_VERSION != latest_version:
             messagebox.showinfo("업데이트 필요", f"최신 버전 {latest_version}이(가) 있습니다.")
-            webbrowser.open("https://github.com/adc000/Hongbo/releases/tag/{}", latest_version)
+            webbrowser.open("https://github.com/adc000/Hongbo/releases/tag/{}".format(latest_version))
             root.destroy()
             sys.exit()
     except requests.RequestException as e:
@@ -74,7 +76,7 @@ def totogo(id, pw, s, cnt, driver, file_path, cnt_label):
         driver.get("https://toto-go.com/promotion/write")
 
         title = driver.find_element(By.NAME, "wr_subject")
-        title.send_keys("♥393아리아♥6th 전직 HEXA 매트릭스♥점핑 이벤트♥반하자♥프리메이플♥{0}".format(generate_random_string()))
+        title.send_keys("{0}{1}".format(titletxt, generate_random_string()))
 
         outer_iframe = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "iframe[src='https://toto-go.com/plugin/editor/smarteditor2/SmartEditor2Skin.html']"))
@@ -91,8 +93,7 @@ def totogo(id, pw, s, cnt, driver, file_path, cnt_label):
         )
 
         editable_area.clear()
-        editable_area.send_keys("https://ariaworld.net/\n- HEXA 매트릭스(6차 전직), 두 번째 마스터리 코어와 모험가, 시그너스, 엔젤릭버스터, 은월/아란 전직업 리마스터!\n\
-- 신규 헤어/성형/치장 아이템 및 컬러링 프리즘, 자석 펫 무료 지원!\n- 자체 개발을 통한 주기적인 버전 업데이트, IV三XT\n- 제네시스 해방 퀘스트 기간 단축, 유니온 아티팩트 구현")
+        editable_area.send_keys(f"{subjecttxt}")
 
         driver.switch_to.default_content()
 
@@ -136,10 +137,9 @@ def todayzo(id, pw, s, cnt, driver, file_path, cnt_label):
             EC.presence_of_element_located((By.TAG_NAME, "body"))
         )
         title = driver.find_element(By.NAME, "wr_subject")
-        title.send_keys("♥393아리아♥6th 전직 HEXA 매트릭스♥점핑 이벤트♥반하자♥프리메이플♥")
-        title = driver.find_element(By.NAME, "wr_content")
-        title.send_keys("https://ariaworld.net/\n- HEXA 매트릭스(6차 전직), 두 번째 마스터리 코어와 모험가, 시그너스, 엔젤릭버스터, 은월/아란 전직업 리마스터!\n\
-- 신규 헤어/성형/치장 아이템 및 컬러링 프리즘, 자석 펫 무료 지원!\n- 자체 개발을 통한 주기적인 버전 업데이트, IV三XT\n- 제네시스 해방 퀘스트 기간 단축, 유니온 아티팩트 구현")
+        title.send_keys(f"{titletxt}")
+        subject = driver.find_element(By.NAME, "wr_content")
+        subject.send_keys(f"{subjecttxt}")
         submit_button = driver.find_element(By.ID, "btn_submit")
         submit_button.click()
         WebDriverWait(driver, 5).until(
@@ -200,7 +200,7 @@ def lintoday(id, pw, s, cnt, driver, file_path, cnt_label):
     for i in range(int(cnt)):
         driver.get("https://lintoday.me/bbs/write.php?bo_table=22")
         title = driver.find_element(By.NAME, "wr_subject")
-        title.send_keys("♥393아리아♥6th 전직 HEXA 매트릭스♥점핑 이벤트♥반하자♥프리메이플♥")
+        title.send_keys(f"{titletxt}")
 
         outer_iframe = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "iframe[src='https://lintoday.me/plugin/editor/smarteditor2/SmartEditor2Skin.html']"))
@@ -217,8 +217,7 @@ def lintoday(id, pw, s, cnt, driver, file_path, cnt_label):
         )
 
         editable_area.clear()
-        editable_area.send_keys("https://ariaworld.net/\n- HEXA 매트릭스(6차 전직), 두 번째 마스터리 코어와 모험가, 시그너스, 엔젤릭버스터, 은월/아란 전직업 리마스터!\n\
-- 신규 헤어/성형/치장 아이템 및 컬러링 프리즘, 자석 펫 무료 지원!\n- 자체 개발을 통한 주기적인 버전 업데이트, IV三XT\n- 제네시스 해방 퀘스트 기간 단축, 유니온 아티팩트 구현")
+        editable_area.send_keys(f"{subjecttxt}")
 
         driver.switch_to.default_content()
 
@@ -433,6 +432,16 @@ entries.append(cnt_entry4)
 
 submit_button = tk.Button(root, text="실행", command=run_test)
 submit_button.grid(row=17, column=0, columnspan=4, pady=20)
+
+if os.path.exists("./title.txt"):
+    with open("./title.txt", "r", encoding="utf-8") as file:
+        titletxt = file.read()
+        print(titletxt)
+
+if os.path.exists("./subject.txt"):
+    with open("./subject.txt", "r", encoding="utf-8") as file:
+        subjecttxt = file.read()
+        print(subjecttxt)
 
 if os.path.exists("./mydata.txt"):
     with open("./mydata.txt", "r", encoding="utf-8") as file:

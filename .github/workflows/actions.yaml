@@ -21,7 +21,7 @@ jobs:
 
       - name: zip files
         run: |
-          zip -r ./홍보기/$COMMIT_TITLE.zip ./홍보기/홍보기.exe ./홍보기/changelog ./홍보기/data.txt ./홍보기/README.md
+          zip -r ./홍보기/$COMMIT_TITLE.zip ./홍보기/홍보기.exe ./홍보기/changelog ./홍보기/data.txt ./홍보기/subject.txt ./홍보기/title.txt ./홍보기/README.md
 
       - name: Create Tag from Commit Title
         run: |

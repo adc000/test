@@ -1,2 +1,8 @@
 dist/*.txt
-!dist/data.txt
+!홍보기/data.txt
+홍보기/*.txt
+!홍보기/subject.txt
+!홍보기/title.txt
+build
+build/*
+build/**
