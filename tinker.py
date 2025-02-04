@@ -18,11 +18,33 @@ import requests
 import webbrowser
 import sys
 
-CURRENT_VERSION = "v2.2"
+import requests
+
+URLS = [
+    "https://toto-go.com",
+    "https://todayzo.com",
+    "https://lintoday.me"
+]
+
+CURRENT_VERSION = "v2.3"
 
 urls = []
 titletxt = ""
 subjecttxt = ""
+
+def check_urls():
+    results = []
+    has_failure = False
+
+    for url in URLS:
+        try:
+            response = requests.head(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=1)
+            results.append(f"✅ {url.replace('https://', '').replace('http://', '')} 접속 성공")
+        except requests.RequestException:
+            results.append(f"❌ {url.replace('https://', '').replace('http://', '')} 접속 실패!")
+            has_failure = True
+
+    return "\n".join(results), has_failure
 
 def check_for_update():
     try:
@@ -45,12 +67,6 @@ def open_in_notepad(file_path):
         subprocess.Popen(["notepad.exe", os.path.realpath(file_path)])
     else:
         messagebox.showerror("Error", "File not found!")
-
-# 알림창 띄우기 함수
-def show_notification(file_path):
-    answer = messagebox.askyesno("홍보 끝", f"{os.path.realpath(file_path)} 파일을 확인하시겠습니까?")
-    if answer:
-        open_in_notepad(file_path)
 
 def generate_random_string(length=30):
     characters = string.ascii_letters + string.digits
@@ -335,21 +351,47 @@ def test():
     cnt_entry4.config(state="normal")
 
 
-    answer = messagebox.askyesno("홍보끝", "클립보드에 url들을 복사하시겠습니까?")
+    answer = messagebox.askyesno("홍보끝", "클립보드에 url들을 복사하시겠습니까?\n예(복사) / 아니요(메모장열기)")
     if answer:
         root.clipboard_clear()
         for idx, url in enumerate(urls):
             root.clipboard_append("{0}. {1}\n".format(idx, url))
-
-    import os
-    show_notification(os.path.realpath(file_path))
+    else:
+        open_in_notepad(os.path.realpath(file_path))
     root.destroy()
 
 root = tk.Tk()
 root.title("홍보 자동화 툴")
 
 root.withdraw()
+
+if os.path.exists("./README.txt"):
+    with open("./README.txt", "r", encoding="utf-8") as file:
+        lines = file.readlines()
+    if lines:
+        title = lines[0].strip()
+        content = "".join(lines[1:]).strip()
+        if messagebox.askyesno(f"{title} 업데이트", f"{content}\n\n다시 보지 않으려면 예를 누르세요."):
+            os.remove("./README.txt")
+
 check_for_update()
+
+while True:
+    result_string, has_failure = check_urls()
+    if has_failure:
+        response = messagebox.askyesnocancel("접속 확인 결과", f"{result_string}\n\n일부 사이트에 접속이 불가능합니다.\n재시도(예) / 무시(아니오) / 취소(프로그램 종료)",
+                                            icon="warning")
+        if response is None:
+            root.quit()
+            exit()
+        elif response is False:
+            break
+        else:
+            continue
+    else:
+        messagebox.showinfo("접속 확인 결과", f"{result_string}\n\n모든 사이트에 접속이 정상적입니다.",
+                            icon="info")
+        break
 
 root.deiconify()
 
@@ -447,14 +489,14 @@ if os.path.exists("./mydata.txt"):
     with open("./mydata.txt", "r", encoding="utf-8") as file:
         lines = file.readlines()
         print(lines)
-        for i, line in enumerate(lines[:12]):  # 최대 12줄까지만 처리
+        for i, line in enumerate(lines[:12]):
             entries[i].delete(0, tk.END)
             entries[i].insert(0, line.strip())
 elif os.path.exists("./data.txt"):
     with open("./data.txt", "r", encoding="utf-8") as file:
         lines = file.readlines()
         print(lines)
-        for i, line in enumerate(lines[:12]):  # 최대 12줄까지만 처리
+        for i, line in enumerate(lines[:12]):
             entries[i].delete(0, tk.END)
             entries[i].insert(0, line.strip())
 
