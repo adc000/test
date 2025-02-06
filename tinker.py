@@ -26,7 +26,7 @@ URLS = [
     "https://lintoday.me"
 ]
 
-CURRENT_VERSION = "v2.3"
+CURRENT_VERSION = "v2.3.1"
 
 urls = []
 titletxt = ""
@@ -38,7 +38,7 @@ def check_urls():
 
     for url in URLS:
         try:
-            response = requests.head(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=1)
+            response = requests.head(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=3)
             results.append(f"✅ {url.replace('https://', '').replace('http://', '')} 접속 성공")
         except requests.RequestException:
             results.append(f"❌ {url.replace('https://', '').replace('http://', '')} 접속 실패!")
@@ -67,6 +67,12 @@ def open_in_notepad(file_path):
         subprocess.Popen(["notepad.exe", os.path.realpath(file_path)])
     else:
         messagebox.showerror("Error", "File not found!")
+
+# 알림창 띄우기 함수
+def show_notification(file_path):
+    answer = messagebox.askyesno("홍보 끝", f"{os.path.realpath(file_path)} 파일을 확인하시겠습니까?")
+    if answer:
+        open_in_notepad(file_path)
 
 def generate_random_string(length=30):
     characters = string.ascii_letters + string.digits
@@ -351,13 +357,14 @@ def test():
     cnt_entry4.config(state="normal")
 
 
-    answer = messagebox.askyesno("홍보끝", "클립보드에 url들을 복사하시겠습니까?\n예(복사) / 아니요(메모장열기)")
+    answer = messagebox.askyesno("홍보끝", "클립보드에 url들을 복사하시겠습니까?")
     if answer:
         root.clipboard_clear()
         for idx, url in enumerate(urls):
             root.clipboard_append("{0}. {1}\n".format(idx, url))
-    else:
-        open_in_notepad(os.path.realpath(file_path))
+
+    import os
+    show_notification(os.path.realpath(file_path))
     root.destroy()
 
 root = tk.Tk()
@@ -383,7 +390,7 @@ while True:
                                             icon="warning")
         if response is None:
             root.quit()
-            exit()
+            sys.exit()
         elif response is False:
             break
         else:
