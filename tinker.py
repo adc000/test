@@ -26,7 +26,7 @@ URLS = [
     "https://lintoday.me"
 ]
 
-CURRENT_VERSION = "v2.3.1"
+CURRENT_VERSION = "v2.3.2"
 
 urls = []
 titletxt = ""
@@ -484,12 +484,12 @@ submit_button.grid(row=17, column=0, columnspan=4, pady=20)
 
 if os.path.exists("./title.txt"):
     with open("./title.txt", "r", encoding="utf-8") as file:
-        titletxt = file.read()
+        titletxt = file.readline().strip()
         print(titletxt)
 
 if os.path.exists("./subject.txt"):
     with open("./subject.txt", "r", encoding="utf-8") as file:
-        subjecttxt = file.read()
+        subjecttxt = file.read().strip()
         print(subjecttxt)
 
 if os.path.exists("./mydata.txt"):
